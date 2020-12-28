@@ -38,6 +38,7 @@ for j,y in enumerate(myPicList):
 
         imgCrop = img[r[0][1]:r[1][1], r[0][0]:r[1][0]]
         #print(f'{r[0][1]}:{r[1][1]}, {r[0][0]}:{r[1][0]}')
+
         cv2.imshow(str(x), imgCrop)
 
         if x==0:
