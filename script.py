@@ -12,7 +12,7 @@ Name can be anything
 import cv2
 import random
 
-path = 'form.png'
+path = 'C:\Faks\\3.god\Projekt\Segmentacija\FilledForms\\1.jpg'
 scale = 0.5
 circles = []
 counter = 0
