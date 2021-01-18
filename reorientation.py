@@ -13,7 +13,7 @@ list = os.listdir("ScannedForms") # dir is your directory path
 number_files = len(list)
 number_files = number_files - 1
 
-for i in range(number_files):
+for file in list:
     refFilename = "ScannedForms\\form.jpg"
 
     print("Reading reference image : ", refFilename)
@@ -21,9 +21,9 @@ for i in range(number_files):
     imReference = cv2.imread(refFilename, cv2.IMREAD_COLOR)
 
     # Read image to be aligned
-    fileName = i + 1
+    #fileName = i + 1
 
-    imFilename = "ScannedForms\\" + str(fileName) + ".jpg"
+    imFilename = "ScannedForms\\" + file
 
     print("Reading image to align : ", imFilename);
 
@@ -97,7 +97,7 @@ for i in range(number_files):
 
     # Write aligned image to disk.
 
-    outFilename = str(fileName) + ".jpg"
+    outFilename = file
 
     outPath = "FilledForms\\" + outFilename
     print("Saving aligned image : ", outFilename);

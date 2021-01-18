@@ -58,17 +58,17 @@ kp1, des1 = orb.detectAndCompute(imgQ,None)
 
 path = 'FilledForms'
 myPicList = os.listdir(path)
-
 for j,y in enumerate(myPicList):
-    img = cv2.imread(path +"\\"+y, cv2.IMREAD_GRAYSCALE)
+   # img = cv2.imread(path +"/"+y)
+    #img = cv2.resize(img, (w, h))
+    img = cv2.imread(path + "\\" + y, cv2.IMREAD_GRAYSCALE)
 
-    print(f'################## Extracting Data from Form {j + 1}  ##################')
+    print(f'################## Extracting Data from Form {j} {y}  ##################')
 
     for x,r in enumerate(roi):
 
-
-        #ime i prezime
         imgCrop = img[r[0][1]:r[1][1], r[0][0]:r[1][0]]
+        #print(f'{r[0][1]}:{r[1][1]}, {r[0][0]}:{r[1][0]}')
 
         #segmentacija imena
         #ps za ime jos nije uvedeni machine learning, probao sam prvo samo sa znamenkama
