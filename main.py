@@ -1,10 +1,8 @@
 import cv2
 import numpy as np
-import pytesseract
+#import pytesseract
 import os
 from PIL import Image
-
-# C:\Program Files\Tesseract-OCR
 
 per = 25
 pixelThreshold=500
@@ -12,11 +10,12 @@ pixelThreshold=500
 roi=[[(214, 112), (1148, 152), 'text', 'ime'],
      [(216, 156), (510, 196), 'text', 'jmbag'],
      [(214, 204), (268, 240), 'text', 'zadatak'],
-     [(1056, 254), (1114, 284), 'text', 'bodovi']]
+     [(1056, 254), (1114, 284), 'text', 'bodovi'],
+     [(536, 242), (1032, 306), ' BUTTONS', 'bodovi']]
 
 
 
-pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+#pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
 # images for machine learning
 #znamenke koje se narezu jedna po jedna i daju se algoritmu da uci
@@ -58,20 +57,17 @@ kp1, des1 = orb.detectAndCompute(imgQ,None)
 
 path = 'FilledForms'
 myPicList = os.listdir(path)
-
 for j,y in enumerate(myPicList):
-    img = cv2.imread(path +"\\"+y, cv2.IMREAD_GRAYSCALE)
 
-    print(f'################## Extracting Data from Form {j + 1}  ##################')
+    img = cv2.imread(path + "\\" + y, cv2.IMREAD_GRAYSCALE)
+
+    print(f'################## Extracting Data from Form {j} {y}  ##################')
 
     for x,r in enumerate(roi):
 
-
-        #ime i prezime
         imgCrop = img[r[0][1]:r[1][1], r[0][0]:r[1][0]]
 
         #segmentacija imena
-        #ps za ime jos nije uvedeni machine learning, probao sam prvo samo sa znamenkama
         if x==0:
             #opet resizam sliku u ovom slucaju sliku imena i prezimena da mogu podjeliti sa hsplit
             imgCrop = cv2.resize(imgCrop, (899, 40))
@@ -80,7 +76,7 @@ for j,y in enumerate(myPicList):
             for d, z in enumerate(test_digits):
                 #tu resizam pojedine slicice da budu iste velicine, objasnjeno gore
                 test_digits[d] = cv2.resize(test_digits[d], (35, 40))
-                #slozio sam da sve segmente, sprema u mapu segmenti da ih mozemo vidjeti lijepo
+                #sprema u mapu segmenti da ih mozemo vidjeti lijepo
                 ime = "segmenti\\" + str(j) + "ime" + str(d) + ".jpg"
                 cv2.imwrite(ime, test_digits[d])
             test_cells = []
@@ -169,6 +165,11 @@ for j,y in enumerate(myPicList):
             ret, result, neighbours, dist = knn.findNearest(test_cells, k=2)
 
             print(result)
+
+        if x==4:
+            ime = "segmenti\\" + str(j) + "Bodovi.jpg"
+            cv2.imwrite(ime, imgCrop)
+
         cv2.waitKey(0)
 
 
