@@ -20,7 +20,7 @@ pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesse
 
 # images for machine learning
 #znamenke koje se narezu jedna po jedna i daju se algoritmu da uci
-digits = cv2.imread("digitstest.jpg",cv2.IMREAD_GRAYSCALE)
+digits = cv2.imread("dgitstest.jpg",cv2.IMREAD_GRAYSCALE)
 
 #prvo moram resizate sliku na te pixele jer inace fja vsplit ne radi, velicina slike mora biti visekratnik broja segmenata
 #znaci rastavljam sliku na 10 djelova horizontalno i 16 djelova vertikalno
@@ -76,7 +76,7 @@ for j,y in enumerate(myPicList):
             #opet resizam sliku u ovom slucaju sliku imena i prezimena da mogu podjeliti sa hsplit
             imgCrop = cv2.resize(imgCrop, (899, 40))
             test_digits = np.hsplit(imgCrop, 31)
-
+            cv2.imshow(imgCrop)
             for d, z in enumerate(test_digits):
                 #tu resizam pojedine slicice da budu iste velicine, objasnjeno gore
                 test_digits[d] = cv2.resize(test_digits[d], (35, 40))
