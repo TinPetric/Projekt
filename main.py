@@ -3,6 +3,9 @@ import numpy as np
 #import pytesseract
 import os
 from PIL import Image
+import classify
+import matplotlib.pyplot as plt
+import tensorflow as tf
 
 per = 25
 pixelThreshold=500
@@ -33,10 +36,11 @@ for row in rows:
         #sada moram resizati pojedinu slicicu ovdje i kasnije svaku nasu pojedinu slicicu sa obrazca
         #jer algoritam za machine learning mora imati slike istih dimenzija
         row_cells[i] = cv2.resize(row_cells[i], (35, 40))
-
+        #cv2.imshow("slika", row_cells[i])
     for cell in row_cells:
         cell = cell.flatten()
         cells.append(cell)
+
 
 cells = np.array(cells, dtype=np.float32)
 
@@ -45,6 +49,7 @@ cells = np.array(cells, dtype=np.float32)
 k = np.arange(10)
 
 cells_labels = np.repeat(k, 16)
+
 
 
 imgQ = cv2.imread('1.jpg', )
@@ -57,6 +62,8 @@ kp1, des1 = orb.detectAndCompute(imgQ,None)
 
 path = 'FilledForms'
 myPicList = os.listdir(path)
+
+classify.train()
 for j,y in enumerate(myPicList):
 
     img = cv2.imread(path + "\\" + y, cv2.IMREAD_GRAYSCALE)
@@ -79,12 +86,13 @@ for j,y in enumerate(myPicList):
                 #sprema u mapu segmenti da ih mozemo vidjeti lijepo
                 ime = "segmenti\\" + str(j) + "ime" + str(d) + ".jpg"
                 cv2.imwrite(ime, test_digits[d])
-            test_cells = []
 
-            for d in test_digits:
-                #tu provodim dio bitan za algoritam, nez tocno zasto al treba nad slicicama biti fja flatten
-                d = d.flatten()
-                test_cells.append(d)
+            test_cells = []
+#
+#          for d in test_digits:
+#              #tu provodim dio bitan za algoritam, nez tocno zasto al treba nad slicicama biti fja flatten
+#              d = d.flatten()
+#              test_cells.append(d)
             test_cells = np.array(test_cells, dtype=np.float32)
 
         #segmentacija za jmbag
@@ -96,7 +104,9 @@ for j,y in enumerate(myPicList):
             for d,z in enumerate(test_digits):
                 test_digits[d] = cv2.resize(test_digits[d], (35, 40))
                 ime = "segmenti\\" + str(j) + "jmbag" + str(d) + ".jpg"
+                #test_digits[d]=cv2.resize(test_digits[d],(28,28))
                 cv2.imwrite(ime, test_digits[d])
+
 
             test_cells = []
 
@@ -104,24 +114,49 @@ for j,y in enumerate(myPicList):
                 d = d.flatten()
                 test_cells.append(d)
             test_cells = np.array(test_cells, dtype=np.float32)
+            jmbag=[]
+            for d,z in enumerate(test_cells):
+                #cv2.imshow("0",test_digits[d])
+                im=test_digits[d]
+                new_model = tf.keras.models.load_model('epic_num_reader.h5')
+                # path="segmenti/0bodovi1.jpg"
+                # img = cv2.imread(path , cv2.IMREAD_GRAYSCALE)
 
+                im = cv2.resize(im, (28, 28))
+                #cv2.imshow("1", img)
+                # draw(img)
+                im = np.invert(np.array(im))
+                #plt.imshow(img, cmap=plt.cm.binary)
+                #plt.show()
+                im = im.flatten()
 
+                im = tf.keras.utils.normalize(im, axis=-1)
+                predictions = new_model.predict(im)
+
+                print(predictions)
+                print('prediction -> ', np.argmax(predictions))
+                jmbag.append(np.argmax(predictions))
+
+            print(jmbag)
             #ovo je algoritam za machine learning
             #prvo se kreira
-            knn = cv2.ml.KNearest_create()
+#            knn = cv2.ml.KNearest_create()
             #zatim trenira
             #u njega mu saljem one slicice sa prve opisane slike, na pocetku programa - cells-  da on nad njima trenira
             #i cells_labels - to je ono sto sam opisao 16 puta 0, 16 puta 1 itd. da algoritam zna da su prvih 16 slika 0
             #drugih 16 jedinice
-            knn.train(cells, cv2.ml.ROW_SAMPLE, cells_labels)
-            ret, result, neighbours, dist = knn.findNearest(test_cells, k=3)
-
+#            knn.train(cells, cv2.ml.ROW_SAMPLE, cells_labels)
+#            ret, result, neighbours, dist = knn.findNearest(test_cells, k=3)
+#
             #ovdje se ispisuje rezultat, trenutno je zakomentiran
             #print(result)
 
         #segmentacija za zadatak, sve isto kao i kod jmbaga
+
+        cv2.imshow("1", imgCrop)
         if x == 2:
-            imgCrop = cv2.resize(imgCrop, (60, 40))
+            cv2.imshow("1",imgCrop)
+            #imgCrop = cv2.resize(imgCrop, (60, 40))
             test_digits = np.hsplit(imgCrop, 2)
 
             for d, z in enumerate(test_digits):
@@ -130,41 +165,40 @@ for j,y in enumerate(myPicList):
                 cv2.imwrite(ime, test_digits[d])
             test_cells = []
 
-            for d in test_digits:
-                d = d.flatten()
-                test_cells.append(d)
+#            for d in test_digits:
+#                d = d.flatten()
+#                test_cells.append(d)
             test_cells = np.array(test_cells, dtype=np.float32)
 
-                # KNN
-            knn = cv2.ml.KNearest_create()
-            knn.train(cells, cv2.ml.ROW_SAMPLE, cells_labels)
-            ret, result, neighbours, dist = knn.findNearest(test_cells, k=3)
-
-            print(result)
-
+ #               # KNN
+ #           knn = cv2.ml.KNearest_create()
+ #           knn.train(cells, cv2.ml.ROW_SAMPLE, cells_labels)
+ #           ret, result, neighbours, dist = knn.findNearest(test_cells, k=3)
+ #
+ #           print(result)
+ #
         #segmentacia za bodove, nisam uveo jos segmentaciju za popunjeni kruzic za broj bodova
         #ovdje je isto sve isto kao i kod jmbaga i zadatka
         if x==3:
             imgCrop = cv2.resize(imgCrop, (60, 40))
             test_digits = np.hsplit(imgCrop, 2)
-
             for d, z in enumerate(test_digits):
                 test_digits[d] = cv2.resize(test_digits[d], (35, 40))
                 ime = "segmenti\\" + str(j) + "bodovi" + str(d) + ".jpg"
                 cv2.imwrite(ime, test_digits[d])
             test_cells = []
 
-            for d in test_digits:
-                d = d.flatten()
-                test_cells.append(d)
+#            for d in test_digits:
+#                d = d.flatten()
+#                test_cells.append(d)
             test_cells = np.array(test_cells, dtype=np.float32)
 
             # KNN
-            knn = cv2.ml.KNearest_create()
-            knn.train(cells, cv2.ml.ROW_SAMPLE, cells_labels)
-            ret, result, neighbours, dist = knn.findNearest(test_cells, k=2)
-
-            print(result)
+#            knn = cv2.ml.KNearest_create()
+#            knn.train(cells, cv2.ml.ROW_SAMPLE, cells_labels)
+#            ret, result, neighbours, dist = knn.findNearest(test_cells, k=2)
+#
+#            print(result)
 
         if x==4:
             ime = "segmenti\\" + str(j) + "Bodovi.jpg"
