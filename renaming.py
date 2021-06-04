@@ -28,8 +28,8 @@ pdfoviZaPremjestiti = [1,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,
                        155,156,157,158,159,161,169,170,171,172,173,174,175,176,
                        177,178,179,180,181,182,183,184,185,186,187]
 
-velikeOdvojiti = True
-pdfoveOdvojiti = True
+velikeOdvojiti = False
+pdfoveOdvojiti = False
 
 # Ako pdfovi nisu odvojeni postaviti zastavicu na True
 if pdfoveOdvojiti:

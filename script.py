@@ -31,11 +31,23 @@ counterPdfVeliki = 0
 counterPdfVeliki2 = 0
 point1=[]
 point2=[]
+myPoints = [[(284, 150), (1534, 210), 'text', 'ime'], [(284, 208), (682, 268), 'broj', 'jmbag'], [(280, 272), (362, 328), 'broj', 'zadatak'], [(1410, 340), (1490, 394), 'broj', 'bodovi']]
+
+myPointsVeliki = [[(244, 108), (1582, 170), 'text', 'ime'], [(250, 176), (678, 236), 'broj', 'jmbag'], [(244, 240), (334, 300), 'broj', 'zadatak'], [(1456, 308), (1542, 364), 'broj', 'bodovi']]
+
+
+myPointsPdf = [[(282, 150), (1528, 196), 'path', 'ime'], [(282, 212), (682, 264), 'broj', 'jmbag'], [(284, 274), (360, 326), 'broj', 'zadatak'], [(1406, 327), (1488, 380), 'broj', 'bodovi']]
+
+myPointsPdfVeliki = [[(244, 106), (1586, 164), 'text', 'ime'], [(246, 170), (676, 230), 'broj', 'jmbag'], [(246, 238), (332, 298), 'broj', 'zadatak'], [(1454, 302), (1544, 360), 'broj', 'bodovi']]
+
+myColor=[]
+
+
 myPoints = []
 myPointsVeliki = []
+
 myPointsPdf = []
 myPointsPdfVeliki = []
-myColor=[]
 def mousePoints(event,x,y,flags,params):
     global counter,point1,point2,counter2,circles,myColor
     if event == cv2.EVENT_LBUTTONDOWN:
@@ -52,67 +64,11 @@ def mousePoints(event,x,y,flags,params):
         circles.append([x,y,myColor])
         counter2 += 1
 
-def mousePointsVeliki(event,x,y,flags,params):
-    global counterVeliki,point1,point2,counterVeliki2,circles,myColor
-    counterVeliki = 0
-    if event == cv2.EVENT_LBUTTONDOWN:
-        if counterVeliki==0:
-            point1=int(x//scale),int(y//scale);
-            counterVeliki +=1
-            myColor = (random.randint(0,2)*200,random.randint(0,2)*200,random.randint(0,2)*200 )
-        elif counterVeliki ==1:
-            point2=int(x//scale),int(y//scale)
-            type = input('Enter Type')
-            name = input ('Enter Name ')
-            myPointsVeliki.append([point1,point2,type,name])
-            counterVeliki=0
-        circles.append([x,y,myColor])
-        counterVeliki2 += 1
 
-def mousePointsPdf(event,x,y,flags,params):
-    global counterPdf,point1,point2,counterPdf2,circles,myColor
-    counterPdf = 0
-    if event == cv2.EVENT_LBUTTONDOWN:
-        if counterPdf==0:
-            point1=int(x//scale),int(y//scale);
-            counterPdf +=1
-            myColor = (random.randint(0,2)*200,random.randint(0,2)*200,random.randint(0,2)*200 )
-        elif counterPdf ==1:
-            point2=int(x//scale),int(y//scale)
-            type = input('Enter Type')
-            name = input ('Enter Name ')
-            myPointsPdf.append([point1,point2,type,name])
-            counterPdf=0
-        circles.append([x,y,myColor])
-        counterPdf2 += 1
-
-def mousePointsPdfVeliki(event,x,y,flags,params):
-    global counterPdfVeliki,point1,point2,counterPdfVeliki2,circles,myColor
-    counterPdfVeliki = 0
-    if event == cv2.EVENT_LBUTTONDOWN:
-        if counterPdfVeliki==0:
-            point1=int(x//scale),int(y//scale);
-            counterPdfVeliki +=1
-            myColor = (random.randint(0,2)*200,random.randint(0,2)*200,random.randint(0,2)*200 )
-        elif counterPdfVeliki ==1:
-            point2=int(x//scale),int(y//scale)
-            type = input('Enter Type')
-            name = input ('Enter Name ')
-            myPointsPdfVeliki.append([point1,point2,type,name])
-            counterPdfVeliki=0
-        circles.append([x,y,myColor])
-        counterPdfVeliki2 += 1
-img = cv2.imread(pathImg)
+img = cv2.imread(pathPdfVeliki)
 img = cv2.resize(img, (0, 0), None, scale, scale)
 
-imgVeliki = cv2.imread(pathImgVeliki)
-imgVeliki = cv2.resize(imgVeliki, (0, 0), None, scale, scale)
 
-imgPdf = cv2.imread(pathPdf)
-imgPdf = cv2.resize(imgPdf, (0, 0), None, scale, scale)
-
-imgPdfVeliki = cv2.imread(pathPdfVeliki)
-imgPdfVeliki = cv2.resize(imgPdfVeliki, (0, 0), None, scale, scale)
 while True:
     # To Display points
     for x,y,color in circles:
@@ -124,50 +80,3 @@ while True:
         break
 
 
-scale = 0.5
-circles = []
-counter = 0
-counter2 = 0
-point1=[]
-point2=[]
-while True:
-    for x, y, color in circles:
-        cv2.circle(imgVeliki, (x, y), 3, color, cv2.FILLED)
-    cv2.imshow("Original Image ", imgVeliki)
-    cv2.setMouseCallback("Original Image ", mousePointsVeliki)
-    if cv2.waitKey(1) & 0xFF == ord('s'):
-        print(myPointsVeliki)
-        break
-
-
-scale = 0.5
-circles = []
-counter = 0
-counter2 = 0
-point1=[]
-point2=[]
-
-while True:
-    for x, y, color in circles:
-        cv2.circle(imgPdf, (x, y), 3, color, cv2.FILLED)
-    cv2.imshow("Original Image ", imgPdf)
-    cv2.setMouseCallback("Original Image ", mousePointsPdf)
-    if cv2.waitKey(1) & 0xFF == ord('s'):
-        print(mousePointsPdf())
-        break
-
-scale = 0.5
-circles = []
-counter = 0
-counter2 = 0
-point1=[]
-point2=[]
-
-while True:
-    for x, y, color in circles:
-        cv2.circle(imgPdfVeliki, (x, y), 3, color, cv2.FILLED)
-    cv2.imshow("Original Image ", imgPdfVeliki)
-    cv2.setMouseCallback("Original Image ", mousePointsPdfVeliki)
-    if cv2.waitKey(1) & 0xFF == ord('s'):
-        print(mousePointsPdfVeliki())
-        break
