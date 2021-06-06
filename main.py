@@ -7,6 +7,47 @@ import classify
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
+
+def center(image):
+
+    original = image.copy()
+
+    thresh = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+
+    # Find contours, obtain bounding box, extract and save ROI
+    ROI_number = 0
+    cnts = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    cnts = cnts[0] if len(cnts) == 2 else cnts[1]
+
+    for c in cnts:
+
+        x, y, w, h = cv2.boundingRect(c)
+        cv2.rectangle(image, (x, y), (x + w, y + h), (36, 255, 12), 2)
+
+        if h> 33 and w > 28:
+            y = y + 8
+            x = x +3
+            w = 27
+            h = 27
+
+            ROI = original[y:y + h, x:x + w]
+
+
+            return ROI
+        if h < 11 and w < 11:
+            continue
+
+        if h >25 and w > 25:
+            continue
+        y = y - 2
+        x = x - 3
+        h = h + 7
+        w = w + 8
+        ROI = original[y:y + h, x:x + w]
+
+        return ROI
+
+
 per = 25
 pixelThreshold=500
 
