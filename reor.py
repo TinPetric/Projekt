@@ -9,14 +9,12 @@ MAX_FEATURES = 5000
 GOOD_MATCH_PERCENT = 0.15
 
 list = os.listdir("prvi_sken2") # dir is your directory path
-number_files =20
+#number_files =len(list)-1
 #number_files = number_files - 1
 br = 1
 print("Reorientating .jgps")
 for i in list:
-    if number_files>20:
-        break
-    number_files+=1
+
     if "PDF" in i:
         continue
     refFilename = "ScannedForms\\form.jpg"

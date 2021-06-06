@@ -1,4 +1,8 @@
+import os
+
+import cv2
 import openpyxl
+import numpy as np
 
 # Give the location of the file
 loc = ("oznake.xlsx")
@@ -7,7 +11,7 @@ wb = openpyxl.load_workbook(loc)
 sheet = wb.active
 
 studenti=[]
-
+oznake=["oznaka","ime1","ime2","prezime1","prezime2","jmbag","brzad","brbod","brbod_broj","dontread"]
 max_col = sheet.max_column
 max_row = sheet.max_row
 
@@ -18,3 +22,57 @@ for i in range(1, max_row + 1):
         cell_obj = sheet.cell(row = i, column = j)
         student[cell.value]= cell_obj.value
     studenti.append(student)
+print(studenti)
+list = os.listdir("segmenti2")
+path = 'segmenti2\\'
+
+
+test_images_brojevi=[]
+test_oznake_brojevi=[]
+
+test_images_slova=[]
+test_oznake_slova=[]
+
+for i in list:
+    for student in studenti:
+        if student["oznaka"] in i:
+            if "jmbag" in i :
+                img = cv2.imread(path + str(i))[:, :, 0]
+                cv2.imshow("",img)
+                img = cv2.resize(img, (28, 28))
+                img = np.invert(np.array([img]))
+                img = img / 255
+                test_images_brojevi.append((img))
+                index=int(i[-5])
+                broj=int(student["jmbag"][index])
+                test_oznake_brojevi.append(broj)
+                #print(test_oznake_brojevi)
+            if "bodovi" in i :
+                img = cv2.imread(path + str(i))[:, :, 0]
+                cv2.imshow("",img)
+                img = cv2.resize(img, (28, 28))
+                img = np.invert(np.array([img]))
+                img = img / 255
+                test_images_brojevi.append((img))
+                index=int(i[-5])
+                if len(str(student["brbod_broj"]))>1and student["brbod_broj"]!=None:
+                    broj=int(str(student["brbod_broj"])[index])
+                else:
+                    broj=student["brbod_broj"]
+                test_oznake_brojevi.append(broj)
+            if "zadatak" in i :
+                img = cv2.imread(path + str(i))[:, :, 0]
+                cv2.imshow("",img)
+                img = cv2.resize(img, (28, 28))
+                img = np.invert(np.array([img]))
+                img = img / 255
+                test_images_brojevi.append((img))
+                index=int(i[-5])
+
+                if len(str(student["brzad"]))>1 and student["brzad"]!=None:
+                    broj=int(str(student["brzad"])[index])
+                else:
+                    broj=student["brzad"]
+                test_oznake_brojevi.append(broj)
+
+print(len(test_oznake_brojevi))
