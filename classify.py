@@ -41,11 +41,10 @@ test_oznake_slova=[]
 
 map = {'A': 0, 'B': 1, 'C': 2, 'Č': 3, 'Ć': 4, 'D': 5, 'Đ': 6, 'E': 7, 'F': 8, 'G': 9, 'H': 10,'I': 11
        ,'J': 12, 'K': 13, 'L': 14, 'M': 15,'N': 16,'O': 17, 'P': 18, 'R': 19, 'S': 20, 'Š': 21,'T': 22, 'U': 23, 'V': 24,
-       'Z': 25, 'Ž': 26, ' ': 27,}
+       'Z': 25, 'Ž': 26, ' ': 27}
 br = 0
 for i in list:
-    if br > 30:
-        br = 0
+    br = 0
     for student in studenti:
 
         if student["oznaka"] in i:
@@ -97,60 +96,43 @@ for i in list:
                 img = img / 255
                 test_images_slova.append((img))
 
+                ime = ""
+                if not student["ime1"] == None:
+                    ime = student["ime1"]
 
-                ime = student["ime1"]
+                ime2 = ""
                 if not student["ime2"] == None:
                     ime2 = student["ime2"]
-                    imeChar2 = [char for char in ime2]
-                    ime2Duljina = len(imeChar2)
+                    ime2 = ime2 + " "
+
+                prezime = ""
+                if not student["prezime1"] == None:
+                    prezime = student["prezime1"]
+
+                prezime2 = ""
                 if not student["prezime2"] == None:
                     prezime2 = student["prezime2"]
-                    prezimeChar2 = [char for char in prezime2]
-                    prezime2Duljina = len(prezimeChar2)
-                prezime = student["prezime1"]
+                    prezime2 = prezime2 + " "
 
-                imeChar = [char for char in ime]
-                if not student["prezime1"] == None:
-                    prezimeChar = [char for char in prezime]
+                imeIPrezime = ime + " " + ime2 + prezime + prezime2
 
-                imeDuljina = len(imeChar)
-                prezimeDuljina = len(prezimeChar)
-                pomocni = 0
-                pomocni2 = 0
-                if br < imeDuljina:
-                    slovo = imeChar[br]
-                    brojSlova = map.get(slovo.upper())
-                    test_oznake_slova.append(brojSlova)
-                if br == imeDuljina:
-                    test_oznake_slova.append(27)
-                if br > imeDuljina:
-                    if not student["ime2"] == None:
-                        if br - imeDuljina  < ime2Duljina:
-                            slovo = imeChar2[br - imeDuljina - 1]
-                            brojSlova = map.get(slovo.upper())
-                            test_oznake_slova.append(brojSlova)
-                        if br - imeDuljina == ime2Duljina:
-                            test_oznake_slova.append(27)
-                        pomocni = ime2Duljina
-                    if br > imeDuljina + pomocni:
-                        if br - imeDuljina - pomocni -1 <  prezimeDuljina:
-                            slovo = prezimeChar[br - imeDuljina - pomocni-1]
-                            brojSlova = map.get(slovo.upper())
-                            test_oznake_slova.append(brojSlova)
-                        if br > imeDuljina + pomocni + prezimeDuljina:
+                imeIPrezimeChar = [char for char in imeIPrezime]
+                if i[-6].isnumeric():
+                    br = int(i[-6] + i[-5])
+                else:
+                    br = int(i[-5])
 
-                            if not student["prezime2"] == None:
-                                if br - imeDuljina - pomocni == prezimeDuljina:
-                                    test_oznake_slova.append(27)
-                                if br - imeDuljina - pomocni - prezimeDuljina < prezime2Duljina:
-                                    slovo = prezimeChar2[br - imeDuljina - pomocni-1 - prezimeDuljina]
-                                    brojSlova = map.get(slovo.upper())
-                                    test_oznake_slova.append(brojSlova)
-                                pomocni2 = prezime2Duljina
-                    if br > imeDuljina + pomocni + prezimeDuljina + pomocni2:
+                if not br > len(imeIPrezimeChar) - 1:
+                    if map.get(imeIPrezimeChar[br].upper()) == None:
                         test_oznake_slova.append(27)
+                    else:
+                        test_oznake_slova.append(map.get(imeIPrezimeChar[br].upper()))
 
-                br  = br + 1
+                else:
+                    test_oznake_slova.append(27)
+
+
+
             #print(len(test_oznake_brojevi))
 #f = open("text_oznake_brojevi.txt", "a")
 #f.write(str(test_oznake_brojevi))
@@ -161,8 +143,7 @@ for i in list:
 #f.close()
 br2 = 0
 for i in test_oznake_slova:
-    if  br2 < 31:
-        print(i)
+    print(i)
     br2 = br2 + 1
 
 
