@@ -1,157 +1,36 @@
-import cv2
+from math import floor
+
 import numpy as np
-import pytesseract
-import os
+import cv2
+import matplotlib.pyplot as plt
 
-# C:\Program Files\Tesseract-OCR
+for i in range(14):
+    img = cv2.imread("segmenti\\" + str(i) +"Bodovi.jpg")
 
-per = 25
-pixelThreshold=500
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-roi=[[(214, 112), (1148, 152), 'text', 'ime'],
-     [(216, 156), (510, 196), 'text', 'jmbag'],
-     [(214, 204), (268, 240), 'text', 'zadatak'],
-     [(1056, 254), (1114, 284), 'text', 'bodovi']]
+    blurred = cv2.medianBlur(gray, 25) #cv2.bilateralFilter(gray,10,50,50)
 
+    minDist = 100
+    param1 = 10 #500
+    param2 = 18 #200 #smaller value-> more false circles
+    minRadius = 5
+    maxRadius = 50 #10
 
+    # docstring of HoughCircles: HoughCircles(image, method, dp, minDist[, circles[, param1[, param2[, minRadius[, maxRadius]]]]]) -> circles
+    circles = cv2.HoughCircles(blurred, cv2.HOUGH_GRADIENT, 1, minDist, param1=param1, param2=param2, minRadius=minRadius, maxRadius=maxRadius)
+    size = img.shape
+    xvalue = size[1]/16
+    print(xvalue)
 
-pytesseract.pytesseract.tesseract_cmd = 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+    if circles is not None:
+        circles = np.uint16(np.around(circles))
+        for i in circles[0,:]:
+            cv2.circle(img, (i[0], i[1]), i[2], (0, 255, 0), 2)
+            print(floor(i[0]/ xvalue))
 
-# images for machine learning
-digits = cv2.imread("digits.png", cv2.IMREAD_GRAYSCALE)
+    # Show result for testing:
 
-
-rows = np.vsplit(digits, 50)
-cells = []
-for row in rows:
-    row_cells = np.hsplit(row, 50)
-    for cell in row_cells:
-        cell = cell.flatten()
-        cells.append(cell)
-cells = np.array(cells, dtype=np.float32)
-
-
-k = np.arange(10)
-
-cells_labels = np.repeat(k, 250)
-
-
-imgQ = cv2.imread('1.jpg', )
-h,w,c = imgQ.shape
-#imgQ = cv2.resize(imgQ,(w//3,h//3))
-
-orb = cv2.ORB_create(1000)
-kp1, des1 = orb.detectAndCompute(imgQ,None)
-#impKp1 = cv2.drawKeypoints(imgQ,kp1,None)
-
-path = 'FilledForms'
-myPicList = os.listdir(path)
-
-for j,y in enumerate(myPicList):
-    img = cv2.imread(path +"\\"+y, cv2.IMREAD_GRAYSCALE)
-
-    print(f'################## Extracting Data from Form {j + 1}  ##################')
-
-    for x,r in enumerate(roi):
-
-
-        #ime i prezime
-        imgCrop = img[r[0][1]:r[1][1], r[0][0]:r[1][0]]
-        #print(f'{r[0][1]}:{r[1][1]}, {r[0][0]}:{r[1][0]}')
-
-        cv2.imshow(str(x), imgCrop)
-        if x==0:
-            cv2.imshow("test", imgCrop)
-            test_digits = np.hsplit(imgCrop, 31)
-            cv2.imshow("test", test_digits[0])
-            cv2.waitKey(0)
-            for i in range(0,30):
-                pom = []
-                x2=x1+parts
-                y2=h
-                imgFinal=imgCrop[y1:y2, x1:x2]
-                x1=x2
-                pom.append(imgFinal)
-
-                ime = []
-                for d in pom:
-                    d = d.flatten()
-                    ime.append(d)
-                ime = np.array(ime, dtype=np.float32)
-
-
-        if x==1:
-
-            h, w, c = imgCrop.shape
-            parts = w // 10
-            # print(parts)
-            x1 = 0
-            y1 = 0
-
-            for i in range(0, 10):
-                pom = []
-                x2 = x1 + parts
-                y2 = h
-                imgFinal = imgCrop[y1:y2, x1:x2]
-                x1 = x2
-                pom.append(imgFinal)
-
-            jmbag = []
-            for d in pom:
-                d = d.flatten()
-                jmbag.append(d)
-            jmbag = np.array(jmbag, dtype=np.float32)
-
-
-
-
-
-        if x == 2:
-
-            h, w, c = imgCrop.shape
-            parts = w // 2
-            # print(parts)
-            x1 = 0
-            y1 = 0
-            for i in range(0, 2):
-                pom = []
-                x2 = x1 + parts
-                y2 = h
-                imgFinal = imgCrop[y1:y2, x1:x2]
-                x1 = x2
-                pom.append(imgFinal)
-
-                zadatak = []
-                for d in pom:
-                    d = d.flatten()
-                    zadatak.append(d)
-                zadatak = np.array(zadatak, dtype=np.float32)
-
-
-        if x==3:
-
-            h, w, c = imgCrop.shape
-            parts = w // 2
-            # print(parts)
-            x1 = 0
-            y1 = 0
-
-            for i in range(0, 2):
-                pom = []
-                x2 = x1 + parts
-                y2 = h
-                imgFinal = imgCrop[y1:y2, x1:x2]
-                x1 = x2
-                pom.append(imgFinal)
-
-                bodovi = []
-                for d in pom:
-                    d = d.flatten()
-                    bodovi.append(d)
-                bodovi = np.array(bodovi, dtype=np.float32)
-
-
-    cv2.waitKey(0)
-
-
-cv2.waitKey(0)
+    plt.imshow(img, cmap=plt.cm.binary)
+    plt.show()
+    cv2.destroyAllWindows()
