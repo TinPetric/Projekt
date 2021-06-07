@@ -41,7 +41,7 @@ test_oznake_slova=[]
 
 map = {'A': 0, 'B': 1, 'C': 2, 'Č': 3, 'Ć': 4, 'D': 5, 'Đ': 6, 'E': 7, 'F': 8, 'G': 9, 'H': 10,'I': 11
        ,'J': 12, 'K': 13, 'L': 14, 'M': 15,'N': 16,'O': 17, 'P': 18, 'R': 19, 'S': 20, 'Š': 21,'T': 22, 'U': 23, 'V': 24,
-       'Z': 25, 'Ž': 26, ' ': 27}
+       'Z': 25, 'Ž': 26, ' ': 27, '-': 28}
 br = 0
 for i in list:
     br = 0
@@ -123,6 +123,8 @@ for i in list:
                     br = int(i[-5])
 
                 if not br > len(imeIPrezimeChar) - 1:
+                    if imeIPrezimeChar[br] == "-":
+                        test_oznake_slova.append(28)
                     if map.get(imeIPrezimeChar[br].upper()) == None:
                         test_oznake_slova.append(27)
                     else:
