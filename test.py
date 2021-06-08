@@ -22,16 +22,14 @@ def readButton(img):
     size = img.shape
     xvalue = size[1]/16
     print("xvalue: ",xvalue)
-    result=0
+    result=None
     print("circles",circles)
     if circles is not None:
         circles = np.uint16(np.around(circles))
         for i in circles[0,:]:
             cv2.circle(img, (i[0], i[1]), i[2], (0, 255, 0), 2)
             result=floor(i[0]/ xvalue)
-            print("result",result)
-
-
+    print("result",result)
 
     # Show result for testing:
 

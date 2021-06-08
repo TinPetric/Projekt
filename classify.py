@@ -38,8 +38,15 @@ test_oznake_brojevi=[]
 test_images_slova=[]
 test_oznake_slova=[]
 
+
+map = {'A': 0, 'B': 1, 'C': 2, 'Č': 3, 'Ć': 4, 'D': 5, 'Đ': 6, 'E': 7, 'F': 8, 'G': 9, 'H': 10,'I': 11
+       ,'J': 12, 'K': 13, 'L': 14, 'M': 15,'N': 16,'O': 17, 'P': 18, 'R': 19, 'S': 20, 'Š': 21,'T': 22, 'U': 23, 'V': 24,
+       'Z': 25, 'Ž': 26, ' ': 27, '-': 28}
+br = 0
 for i in list:
+    br = 0
     for student in studenti:
+
         if student["oznaka"] in i:
             if "jmbag" in i and "CIPsharp_20210326_111149_0008" not in i:
                 img = cv2.imread(path + str(i))[:, :, 0]
@@ -82,8 +89,53 @@ for i in list:
                 else:
                     broj=10
                 test_oznake_brojevi.append(broj)
+            if "ime" in i :
+                img = cv2.imread(path + str(i))[:, :, 0]
+                img = cv2.resize(img, (28, 28))
+                img = np.invert(np.array([img]))
+                img = img / 255
+                test_images_slova.append((img))
 
-#print(len(test_oznake_brojevi))
+                ime = ""
+                if not student["ime1"] == None:
+                    ime = student["ime1"]
+
+                ime2 = ""
+                if not student["ime2"] == None:
+                    ime2 = student["ime2"]
+                    ime2 = ime2 + " "
+
+                prezime = ""
+                if not student["prezime1"] == None:
+                    prezime = student["prezime1"]
+
+                prezime2 = ""
+                if not student["prezime2"] == None:
+                    prezime2 = student["prezime2"]
+                    prezime2 = prezime2 + " "
+
+                imeIPrezime = ime + " " + ime2 + prezime + prezime2
+
+                imeIPrezimeChar = [char for char in imeIPrezime]
+                if i[-6].isnumeric():
+                    br = int(i[-6] + i[-5])
+                else:
+                    br = int(i[-5])
+
+                if not br > len(imeIPrezimeChar) - 1:
+                    if imeIPrezimeChar[br] == "-":
+                        test_oznake_slova.append(28)
+                    if map.get(imeIPrezimeChar[br].upper()) == None:
+                        test_oznake_slova.append(27)
+                    else:
+                        test_oznake_slova.append(map.get(imeIPrezimeChar[br].upper()))
+
+                else:
+                    test_oznake_slova.append(27)
+
+
+
+            #print(len(test_oznake_brojevi))
 #f = open("text_oznake_brojevi.txt", "a")
 #f.write(str(test_oznake_brojevi))
 #f.close()
@@ -91,7 +143,10 @@ for i in list:
 #f = open("text_images_brojevi.txt", "a")
 #f.write(str(test_images_brojevi))
 #f.close()
-
+br2 = 0
+for i in test_oznake_slova:
+    print(i)
+    br2 = br2 + 1
 
 
 
