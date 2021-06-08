@@ -4,14 +4,16 @@ import numpy as np
 #import pytesseract
 import os
 from PIL import Image
-
-import lines
-#import classify
-#import matplotlib.pyplot as plt
-
 import tensorflow as tf
 
 import matplotlib.pyplot as plt
+
+
+import lines
+import test
+
+
+
 
 
 
@@ -29,7 +31,9 @@ def unsharp_mask(image, kernel_size=(5, 5), sigma=5.0, amount=8.0, threshold=0):
 
     return sharpened
 
-
+map = {0:'A', 1:'B',  2:'C', 3:'D', 4:'E', 5:'F',6: 'G',7: 'H',8:'I'
+       ,9:'J',10: 'K',11: 'L',12: 'M',13:'N',14:'O',15: 'P', 16:'R',17: 'S',18: 'T',19: 'U',20: 'V',
+       21:'Z',22: ' ',23: '-'}
 
 per = 25
 pixelThreshold=500
@@ -56,7 +60,23 @@ myPicList = os.listdir(path)
 #classify.train()
 #new_model = tf.keras.models.load_model('epic_num_reader.h5')
 for j,y in enumerate(myPicList):
+    testiraj=False
+    if j>=len(myPicList)-21:
+        segmentipath="segmentiTest\\"
+        testiraj = True
 
+    else:
+        continue
+        segmentipath="segmentiTrain\\"
+    if j == len(myPicList) - 21:
+
+        import classify4
+
+        studenti = classify4.getStudents()
+        classify4.trainNumbers()
+        modelNumbers = tf.keras.models.load_model('epic_num_reader4.h5')
+        classify4.trainLetters()
+        modelLetters = tf.keras.models.load_model('epic_letters_reader4.h5')
 
     img = cv2.imread(path + "\\" + y, cv2.IMREAD_GRAYSCALE)
 
@@ -65,122 +85,147 @@ for j,y in enumerate(myPicList):
     for x,r in enumerate(roi):
 
         imgCrop = img[r[0][1]:r[1][1], r[0][0]:r[1][0]]
+        #cv2.imshow("",imgCrop)
 
         #segmentacija imena
         if x==0:
             #opet resizam sliku u ovom slucaju sliku imena i prezimena da mogu podjeliti sa hsplit
             imgCrop = cv2.resize(imgCrop, (899, 40))
             test_digits = np.hsplit(imgCrop, 31)
-
+            result = []
             for d, z in enumerate(test_digits):
                 #tu resizam pojedine slicice da budu iste velicine, objasnjeno gore
                 test_digits[d] = cv2.resize(test_digits[d], (35, 40))
                 #sprema u mapu segmenti da ih mozemo vidjeti lijepo
-                ime = "segmenti2\\" + str(y) + "ime" + str(d) + ".jpg"
+                ime = segmentipath + str(y) + "ime" + str(d) + ".jpg"
 
                 cv2.imwrite(ime, test_digits[d])
 
-            jmbag=[]
             for d,z in enumerate(test_digits):
-                ime = "segmenti2\\" + str(y) + "ime" + str(d) + ".jpg"
+                ime = segmentipath + str(y) + "ime" + str(d) + ".jpg"
 
                 cv2.imwrite(ime, test_digits[d])
                 im2 = cv2.imread(ime)
                 test_digits[d] = lines.remove(im2)
 
                 test_digits[d] = cv2.resize(test_digits[d], (28, 28))
-               # crop_img = test_digits[d][2:24, 3:25]
-                #crop_img = cv2.resize(crop_img, (28, 28))
+
                 sharpen = unsharp_mask(test_digits[d])
 
                 _,sharpen= cv2.threshold(sharpen, 127, 255, cv2.THRESH_BINARY)
 
                 cv2.imwrite(ime, sharpen)
+
+                image = cv2.imread(ime)[:, :, 0]
+                image = cv2.resize(image, (28, 28))
+                image = np.invert(np.array([image]))
+                image = image / 255
+
+                if testiraj:
+                    predictions = modelLetters.predict(image)
+                    result.append(np.argmax(predictions))
+
+            if testiraj:
+                res=""
+                for r in result:
+                    res+=map[r]
+                print(res)
+
 
         #segmentacija za jmbag
         if x==1:
             #sve isto kao i kod imena
             imgCrop = cv2.resize(imgCrop, (300, 40))
             test_digits = np.hsplit(imgCrop, 10)
-
+            result=[]
             for d,z in enumerate(test_digits):
                 test_digits[d] = cv2.resize(test_digits[d], (35, 40))
-                ime = "segmenti2\\" + str(y) + "jmbag" + str(d) + ".jpg"
+                ime = segmentipath + str(y) + "jmbag" + str(d) + ".jpg"
                 #test_digits[d]=cv2.resize(test_digits[d],(28,28))
                 cv2.imwrite(ime, test_digits[d])
 
             jmbag=[]
             for d,z in enumerate(test_digits):
-                ime = "segmenti2\\" + str(y) + "jmbag" + str(d) + ".jpg"
+                ime = segmentipath + str(y) + "jmbag" + str(d) + ".jpg"
 
                 cv2.imwrite(ime, test_digits[d])
                 im2 = cv2.imread(ime)
                 test_digits[d] = lines.remove(im2)
 
                 test_digits[d] = cv2.resize(test_digits[d], (28, 28))
-               # crop_img = test_digits[d][2:24, 3:25]
-                #crop_img = cv2.resize(crop_img, (28, 28))
+
                 sharpen = unsharp_mask(test_digits[d])
 
                 _,sharpen= cv2.threshold(sharpen, 127, 255, cv2.THRESH_BINARY)
 
                 cv2.imwrite(ime, sharpen)
 
-                im2=cv2.imread(ime)[:,:,0]
-                im2 = np.invert(np.array([im2]))
 
-                im2 = im2 / 255
-                #im2 = tf.keras.utils.normalize(im2, axis=-1)
-                #predictions = new_model.predict(im2)
+                image = cv2.imread(ime)[:, :, 0]
+                image = cv2.resize(image, (28, 28))
+                image = np.invert(np.array([image]))
+                image = image / 255
 
-                #print(predictions)
-                #print('prediction -> ', np.argmax(predictions))
-                #jmbag.append(np.argmax(predictions))
-                #plt.imshow(im2[0], cmap=plt.cm.binary)
-                #plt.show()
+                if testiraj:
+                    predictions = modelNumbers.predict(image)
+                    result.append(np.argmax(predictions))
 
-            #print(jmbag)
+            if testiraj:
+                res = ""
+                for r in result:
+                    res += str(r)
+                print(res)
 
-
+        #zadatak
         if x == 2:
            # cv2.imshow("1",imgCrop)
             #imgCrop = cv2.resize(imgCrop, (60, 40))
             test_digits = np.hsplit(imgCrop, 2)
-
+            result=[]
             for d, z in enumerate(test_digits):
                 test_digits[d] = cv2.resize(test_digits[d], (35, 40))
-                ime = "segmenti2\\" + str(y) + "zadatak" + str(d) + ".jpg"
+                ime = segmentipath + str(y) + "zadatak" + str(d) + ".jpg"
                 cv2.imwrite(ime, test_digits[d])
 
-            jmbag=[]
             for d,z in enumerate(test_digits):
-                ime = "segmenti2\\" + str(y) + "zadatak" + str(d) + ".jpg"
+                ime = segmentipath + str(y) + "zadatak" + str(d) + ".jpg"
 
                 cv2.imwrite(ime, test_digits[d])
                 im2 = cv2.imread(ime)
                 test_digits[d] = lines.remove(im2)
 
                 test_digits[d] = cv2.resize(test_digits[d], (28, 28))
-               # crop_img = test_digits[d][2:24, 3:25]
-                #crop_img = cv2.resize(crop_img, (28, 28))
                 sharpen = unsharp_mask(test_digits[d])
-
                 _,sharpen= cv2.threshold(sharpen, 127, 255, cv2.THRESH_BINARY)
 
                 cv2.imwrite(ime, sharpen)
+                image = cv2.imread(ime)[:, :, 0]
+                image = cv2.resize(image, (28, 28))
+                image = np.invert(np.array([image]))
+                image = image / 255
 
+                if testiraj:
+                    predictions = modelNumbers.predict(image)
+                    result.append(np.argmax(predictions))
 
+            if testiraj:
+                res = ""
+                for r in result:
+                    res += str(r)
+                print(res)
+
+        #bodovi
         if x==3:
             imgCrop = cv2.resize(imgCrop, (60, 40))
             test_digits = np.hsplit(imgCrop, 2)
             for d, z in enumerate(test_digits):
                 test_digits[d] = cv2.resize(test_digits[d], (35, 40))
-                ime = "segmenti2\\" + str(y) + "bodovi" + str(d) + ".jpg"
+                ime = segmentipath + str(y) + "bodovi" + str(d) + ".jpg"
                 cv2.imwrite(ime, test_digits[d])
 
-            jmbag=[]
+            result=[]
             for d,z in enumerate(test_digits):
-                ime = "segmenti2\\" + str(y) + "bodovi" + str(d) + ".jpg"
+                ime = segmentipath + str(y) + "bodovi" + str(d) + ".jpg"
 
                 cv2.imwrite(ime, test_digits[d])
                 im2 = cv2.imread(ime)
@@ -194,12 +239,29 @@ for j,y in enumerate(myPicList):
                 _,sharpen= cv2.threshold(sharpen, 127, 255, cv2.THRESH_BINARY)
 
                 cv2.imwrite(ime, sharpen)
+                image = cv2.imread(ime)[:, :, 0]
+                image = cv2.resize(image, (28, 28))
+                image = np.invert(np.array([image]))
+                image = image / 255
+
+                if testiraj:
+                    predictions = modelNumbers.predict(image)
+                    result.append(np.argmax(predictions))
+
+            if testiraj:
+                res = ""
+                for r in result:
+                    res += str(r)
+                print(res)
 
 
 
         if x==4:
-            ime = "segmenti2\\" + str(y) + "Bodovi.jpg"
+            ime = segmentipath + str(y) + "Bodovi.jpg"
             cv2.imwrite(ime, imgCrop)
+            image=cv2.imread(ime)
+            res=test.readButton(image)
+            print(res)
 
         cv2.waitKey(0)
 
