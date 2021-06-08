@@ -48,7 +48,7 @@ for i in list:
                 img = img / 255
                 test_images_brojevi.append((img))
                 index=int(i[-5])
-                print(i,student["jmbag"])
+                #print(i,student["jmbag"])
                 broj=int(str(student["jmbag"])[index])
                 test_oznake_brojevi.append(broj)
                 #print(test_oznake_brojevi)
@@ -116,11 +116,11 @@ def train():
 
     number=len(test_oznake_brojevi) ## ==518
     number_train=300
-    x_train=np.array(test_images_brojevi[:1570])
-    y_train=np.array(test_oznake_brojevi[:1570])
+    x_train=np.array(test_images_brojevi[:1800])
+    y_train=np.array(test_oznake_brojevi[:1800])
 
-    x_test=np.array(test_images_brojevi[1571:2020])
-    y_test=np.array(test_oznake_brojevi[1571:2020])
+    x_test=np.array(test_images_brojevi[1801:2243])
+    y_test=np.array(test_oznake_brojevi[1801:2243])
     #(x_train, y_train), (x_test, y_test) = mnist.load_data()
 
     def draw(n):
@@ -218,4 +218,4 @@ def clasify():
 #            print(np.argmax(predictions))
 
 train()
-clasify()
+#clasify()
