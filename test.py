@@ -1,9 +1,10 @@
+"""
 from math import floor
 
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-"""
+
 def readButton(img):
     #img = cv2.imread("segmenti\\" + str(i) +"Bodovi.jpg")
 
@@ -39,26 +40,13 @@ def readButton(img):
     return result
     
 """
+
+
 import tkinter as tk
-import os
 from PIL import ImageTk, Image
 
-#path = "ucenje\\"
+path = "ucenje\\"
 
-list = os.listdir("segmentiTrain")
-path = 'segmentiTrain\\'
-for i in list:
-    if "Bodovi" in i:
-        #img = cv2.imread(path+i)
-        ime = path + i
-        root = tk.Tk()
-
-        img = ImageTk.PhotoImage(Image.open(ime))
-        label = tk.Label(root, image=img).pack()
-        print(label)
-        root.after(1000, lambda: root.destroy())
-        root.mainloop()
-""""
 i = 358
 for i in range(2500,2633):
     print(str(i + 1))
@@ -70,4 +58,5 @@ for i in range(2500,2633):
 
     root.after(1000, lambda: root.destroy())
     root.mainloop()
-"""
+
+

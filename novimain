@@ -10,7 +10,8 @@ import matplotlib.pyplot as plt
 
 
 import lines
-import test
+import test3
+import findStudent
 
 
 
@@ -72,7 +73,6 @@ for j,y in enumerate(myPicList):
 
         import classify4
 
-        studenti = classify4.getStudents()
         classify4.trainNumbers()
         modelNumbers = tf.keras.models.load_model('epic_num_reader4.h5')
         classify4.trainLetters()
@@ -81,7 +81,7 @@ for j,y in enumerate(myPicList):
     img = cv2.imread(path + "\\" + y, cv2.IMREAD_GRAYSCALE)
 
     print(f'################## Extracting Data from Form {j} {y}  ##################')
-
+    stud=[]
     for x,r in enumerate(roi):
 
         imgCrop = img[r[0][1]:r[1][1], r[0][0]:r[1][0]]
@@ -130,6 +130,7 @@ for j,y in enumerate(myPicList):
                 res=""
                 for r in result:
                     res+=map[r]
+                stud.append(res)
                 print(res)
 
 
@@ -175,6 +176,7 @@ for j,y in enumerate(myPicList):
                 res = ""
                 for r in result:
                     res += str(r)
+                stud.append(res)
                 print(res)
 
         #zadatak
@@ -213,6 +215,7 @@ for j,y in enumerate(myPicList):
                 res = ""
                 for r in result:
                     res += str(r)
+                stud.append(res)
                 print(res)
 
         #bodovi
@@ -253,6 +256,7 @@ for j,y in enumerate(myPicList):
                 res = ""
                 for r in result:
                     res += str(r)
+                stud.append(res)
                 print(res)
 
 
@@ -261,10 +265,14 @@ for j,y in enumerate(myPicList):
             ime = segmentipath + str(y) + "Bodovi.jpg"
             cv2.imwrite(ime, imgCrop)
             image=cv2.imread(ime)
-            res=test.readButton(image)
+            res=test3.readButton(image)
+            stud.append(res)
             print(res)
 
+
         cv2.waitKey(0)
+    print(stud)
+    print("Rezultat:",findStudent.find2(stud[0],stud[1]))
 
 
 
