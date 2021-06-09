@@ -7,9 +7,189 @@ import tensorflow as tf
 from tensorflow.keras import Model, layers
 import numpy as np
 
+import openpyxl
+
+
+
+
+# Give the location of the file
+loc = ("oznake.xlsx")
+
+wb = openpyxl.load_workbook(loc)
+sheet = wb.active
+
+studenti=[]
+
+max_col = sheet.max_column
+max_row = sheet.max_row
+
+for i in range(1, max_row + 1):
+    student={}
+    for j in range(1, max_col + 1):
+        cell = sheet.cell(row=1, column=j)
+        cell_obj = sheet.cell(row = i, column = j)
+        student[cell.value]= cell_obj.value
+    studenti.append(student)
+
+
+
+
+
+test_images_brojevi=[]
+test_oznake_brojevi=[]
+
+test_images_slova=[]
+test_oznake_slova=[]
+
+
+map = {'A': 0, 'B': 1, 'C': 2, 'Č': 2, 'Ć': 2, 'D': 3, 'Đ': 3, 'E': 4, 'F': 5, 'G': 6, 'H': 7,'I': 8
+       ,'J': 9, 'K': 10, 'L': 11, 'M': 12,'N': 13,'O': 14, 'P': 15, 'R': 16, 'S': 17, 'Š': 17,'T': 18, 'U': 19, 'V': 20,
+       'Z': 21, 'Ž': 21, ' ': 22, '-': 23}
+
+list = os.listdir("segmenti2")
+path = 'segmenti2\\'
+br = 0
+for i in list:
+    br = 0
+    for student in studenti:
+
+        if student["oznaka"] in i:
+            if "jmbag" in i: #and "CIPsharp_20210326_111149_0008" not in i:
+                img = cv2.imread(path + str(i))[:, :, 0]
+                img = cv2.resize(img, (28, 28))
+                img = np.invert(np.array([img]))
+                img = img / 255
+                test_images_brojevi.append(img)
+                index=int(i[-5])
+                #print(i,student["jmbag"])
+                broj=int(str(student["jmbag"])[index])
+                test_oznake_brojevi.append(broj)
+                #print(test_oznake_brojevi)
+            if "bodovi" in i :
+                img = cv2.imread(path + str(i))[:, :, 0]
+                img = cv2.resize(img, (28, 28))
+                img = np.invert(np.array([img]))
+                img = img / 255
+                test_images_brojevi.append(img)
+                index=int(i[-5])
+                if student["brbod_broj"]!=None:
+                    if len(str(student["brbod_broj"]))>1:
+                        broj=int(str(student["brbod_broj"])[index])
+                    else:
+                        broj=int(student["brbod_broj"])
+                else:
+                    broj=10
+                test_oznake_brojevi.append(broj)
+            if "zadatak" in i :
+                img = cv2.imread(path + str(i))[:, :, 0]
+                img = cv2.resize(img, (28, 28))
+                img = np.invert(np.array([img]))
+                img = img / 255
+                test_images_brojevi.append(img)
+                index=int(i[-5])
+                if student["brzad"]!=None:
+                    if len(str(student["brzad"]))>1:
+                        broj=int(str(student["brzad"])[index])
+                    else:
+                        broj=int(student["brzad"])
+                else:
+                    broj=10
+                test_oznake_brojevi.append(broj)
+            if "ime" in i :
+                img = cv2.imread(path + str(i))[:, :, 0]
+                img = cv2.resize(img, (28, 28))
+                img = np.invert(np.array([img]))
+                img = img / 255
+                test_images_slova.append(img)
+
+                ime = ""
+                if not student["ime1"] == None:
+                    ime = student["ime1"]
+
+                ime2 = ""
+                if not student["ime2"] == None:
+                    ime2 = student["ime2"]
+                    ime2 = ime2 + " "
+
+                prezime = ""
+                if not student["prezime1"] == None:
+                    prezime = student["prezime1"]
+
+                prezime2 = ""
+                if not student["prezime2"] == None:
+                    prezime2 = student["prezime2"]
+                    prezime2 = prezime2 + " "
+
+                imeIPrezime = ime + " " + ime2 + prezime + prezime2
+
+                imeIPrezimeChar = [char for char in imeIPrezime]
+                if i[-6].isnumeric():
+                    br = int(i[-6] + i[-5])
+                else:
+                    br = int(i[-5])
+
+                if not br > len(imeIPrezimeChar) - 1:
+                    if imeIPrezimeChar[br] == "-":
+                        test_oznake_slova.append(23)
+                    elif map.get(imeIPrezimeChar[br].upper()) == None:
+                        test_oznake_slova.append(22)
+                    else:
+                        test_oznake_slova.append(map.get(imeIPrezimeChar[br].upper()))
+
+                else:
+                    test_oznake_slova.append(22)
+
+
+
+br2 = 0
+for i in test_oznake_slova:
+    #print(i)
+    br2 = br2 + 1
+
+map2={}
+
+for v in map.values():
+    map2[v]=0
+#print(map2)
+for i in test_oznake_slova:
+    #print(i)
+    #print(i,map2[i])
+    map2[i]+=1
+print(map2)
+sum=0
+for i in map2:
+    if i!=22:
+        sum+=map2[i]
+avg=sum/(len(map)-1)
+#print(len(map))
+brojac=0
+i=0
+while(1):
+    if test_oznake_slova[i]==22:
+        if brojac>avg:
+            test_oznake_slova.pop(i)
+            test_images_slova.pop(i)
+            i-=1
+        else: brojac+=1
+    if i< (len(test_oznake_slova)-1):
+        i+=1
+    else:
+        break
+
+map2={}
+#print(test_oznake_slova)
+for v in map.values():
+    map2[v]=0
+#print(map2)
+for i in test_oznake_slova:
+    #print(i)
+    #print(i,map2[i])
+    map2[i]+=1
+print(map2)
+
 
 # MNIST dataset parameters.
-num_classes = 10 # total classes (0-9 digits).
+num_classes = 11 # total classes (0-9 digits).
 
 # Training parameters.
 learning_rate = 0.001
@@ -24,13 +204,21 @@ fc1_units = 1024 # number of neurons for 1st fully-connected layer.
 
 
 
-# Prepare MNIST data.
-from tensorflow.keras.datasets import mnist
-(x_train, y_train), (x_test, y_test) = mnist.load_data()
-# Convert to float32.
-x_train, x_test = np.array(x_train, np.float32), np.array(x_test, np.float32)
-# Normalize images value from [0, 255] to [0, 1].
-x_train, x_test = x_train / 255., x_test / 255.
+## Prepare MNIST data.
+#from tensorflow.keras.datasets import mnist
+#(x_train, y_train), (x_test, y_test) = mnist.load_data()
+## Convert to float32.
+#x_train, x_test = np.array(x_train, np.float32), np.array(x_test, np.float32)
+## Normalize images value from [0, 255] to [0, 1].
+#x_train, x_test = x_train / 255., x_test / 255.
+
+number = len(test_oznake_brojevi)  ## ==2244
+number_train = 300
+x_train = np.array(test_images_brojevi[:1570])
+y_train = np.array(test_oznake_brojevi[:1570])
+
+x_test = np.array(test_images_brojevi[1571:2020])
+y_test = np.array(test_oznake_brojevi[1571:2020])
 
 # Use tf.data API to shuffle and batch data.
 train_data = tf.data.Dataset.from_tensor_slices((x_train, y_train))
@@ -151,24 +339,11 @@ def predict() :
                 img = cv2.resize(img, (28, 28))
                 img = np.invert(np.array([img]))
                 img = img / 255
-                test_images.append((img))
+                test_images.append(img)
     predictions = conv_net(test_images)
-    print(np.argmax(predictions))
+    #print(np.argmax(predictions))
     for i in predictions:
         print(np.argmax(i))
 
-#im1 = cv2.imread("test.jpg")[:, :, 0]
-#cv2.imshow("1", im1)
-#im1 = cv2.resize(im1, (28, 28))
-#im1 = np.invert(np.array([im1]))
-#im1 = im1 / 255
-#im2 = cv2.imread("test2.jpg")[:, :, 0]
-#cv2.imshow("1", im2)
-#im2 = cv2.resize(im2, (28, 28))
-#im2 = np.invert(np.array([im2]))
-#im2 = im2 / 255
-#test_images = [im1,im2]
-#predictions = conv_net(test_images)
-#for i in predictions:
-#    print(np.argmax(i))
+
 predict()

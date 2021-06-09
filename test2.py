@@ -31,7 +31,7 @@ for i in list:
         blurred = cv2.medianBlur(gray, 25) #cv2.bilateralFilter(gray,10,50,50)
 
         minDist = 100
-        param1 = 10 #500
+        param1 = 150 #500
         param2 = 10 #200 #smaller value-> more false circles
         minRadius = 5
         maxRadius = 50 #10

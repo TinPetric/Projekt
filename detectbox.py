@@ -90,41 +90,47 @@ pixelThreshold=500
 ##impKp1 = cv2.drawKeypoints(imgQ,kp1,None)
 
 path = 'orijentirani2'
+#path="prvi_sken2"
 myPicList = os.listdir(path)
 
 #classify.train()
 #new_model = tf.keras.models.load_model('epic_num_reader.h5')
 for j,y in enumerate(myPicList):
+    if "PDF" in y:
+        continue
     file_path=path + "\\" + y
-
-    img = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
-    cv2.imshow("", img)
-    cv2.waitKey(0)
-
     rects, grouping_rects, image, output_image=detect(file_path)
     a=grouping_rects
-    print(len(rects))
-    if len(grouping_rects)==4 and len(rects)==44:
 
-        roi = [[(a[0][0], a[0][1]), (a[0][2], a[0][3]), 'text', 'ime'],
-               [(a[1][0], a[1][1]), (a[1][2], a[1][3]), 'text', 'jmbag'],
-               [(a[2][0], a[2][1]), (a[2][2], a[2][3]), 'text', 'zadatak'],
-               [(a[3][0], a[3][1]), (a[3][2], a[3][3]), 'text', 'bodovi']]
+    if len(grouping_rects)==4 and len(rects)==44:
+        print(rects)
+        roi = [[(int(a[0][0]),int(a[0][1])), (int(a[0][0]+int(a[0][2])),int(a[0][1])+ int(a[0][3])), 'text', 'ime'],
+               [(int(a[1][0]),int(a[1][1])), (int(a[1][0]+int(a[1][2])),int(a[1][1])+ int(a[1][3])), 'text', 'jmbag'],
+               [(int(a[2][0]),int(a[2][1])), (int(a[2][0]+int(a[2][2])),int(a[2][1])+ int(a[2][3])), 'text', 'zadatak'],
+               [(int(a[3][0]),int(a[3][1])), (int(a[3][0]+int(a[3][2])),int(a[3][1])+ int(a[3][3])), 'text', 'bodovi']]
             ##   [(536, 242), (1032, 306), ' BUTTONS', 'bodovi']]
     else:
-        roi=[[(210, 112), (933, 43), 'text', 'ime'],
-             [(210, 157), (302, 42), 'text', 'jmbag'],
-             [(210, 203), (59, 42), 'text', 'zadatak'],
-             [(1056, 250), (60, 42), 'text', 'bodovi']]
-    print(roi)
+        roi = [[(214, 112), (1148, 152), 'text', 'ime'],
+               [(216, 156), (510, 196), 'text', 'jmbag'],
+               [(214, 204), (268, 240), 'text', 'zadatak'],
+               [(1056, 254), (1114, 284), 'text', 'bodovi'],
+               [(536, 242), (1032, 306), ' BUTTONS', 'bodovi']]
+        #roi=[[(210, 112), (933, 43), 'text', 'ime'],
+        #     [(210, 157), (302, 42), 'text', 'jmbag'],
+        #     [(210, 203), (59, 42), 'text', 'zadatak'],
+        #     [(1056, 250), (60, 42), 'text', 'bodovi']]
+    #print(roi)
 
         #  [(210, 112, 933, 43), (210, 157, 302, 42), (210, 203, 59, 42), (1056, 250, 60, 42)]
-
+    img = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
+    #cv2.imshow("",img)
+    #cv2.waitKey(0)
     for x,r in enumerate(roi):
-
+        #print(x, r)
+        #print(r[0][1],r[1][1], r[0][0],r[1][0])
         imgCrop = img[r[0][1]:r[1][1], r[0][0]:r[1][0]]
-        cv2.imshow("",imgCrop)
-        cv2.waitKey(0)
+        #cv2.imshow("",imgCrop)
+        #cv2.waitKey(0)
 
         #segmentacija imena
         if x==0:
@@ -231,7 +237,7 @@ for j,y in enumerate(myPicList):
 
 
         if x==3:
-            #imgCrop = cv2.resize(imgCrop, (60, 40))
+            imgCrop = cv2.resize(imgCrop, (60, 40))
             test_digits = np.hsplit(imgCrop, 2)
             for d, z in enumerate(test_digits):
                 test_digits[d] = cv2.resize(test_digits[d], (35, 40))
