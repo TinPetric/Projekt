@@ -25,7 +25,7 @@ def readButton(img):
     size = img.shape
     xvalue= size[1]/16
     result=None
-
+    print(circles)
     if circles is not None:
         circles = np.uint16(np.around(circles))
         for i in circles[0,:]:

@@ -63,6 +63,7 @@ myPicList = os.listdir(path)
 for j,y in enumerate(myPicList):
     testiraj=False
     if j>=len(myPicList)-21:
+    #if j == len(myPicList) - 21:
         segmentipath="segmentiTest\\"
         testiraj = True
 
@@ -81,7 +82,7 @@ for j,y in enumerate(myPicList):
     img = cv2.imread(path + "\\" + y, cv2.IMREAD_GRAYSCALE)
 
     print(f'################## Extracting Data from Form {j} {y}  ##################')
-    stud=[]
+    stud={}
     for x,r in enumerate(roi):
 
         imgCrop = img[r[0][1]:r[1][1], r[0][0]:r[1][0]]
@@ -116,6 +117,7 @@ for j,y in enumerate(myPicList):
                 _,sharpen= cv2.threshold(sharpen, 127, 255, cv2.THRESH_BINARY)
 
                 cv2.imwrite(ime, sharpen)
+                #cv2.imwrite(ime, test_digits[d])
 
                 image = cv2.imread(ime)[:, :, 0]
                 image = cv2.resize(image, (28, 28))
@@ -130,8 +132,8 @@ for j,y in enumerate(myPicList):
                 res=""
                 for r in result:
                     res+=map[r]
-                stud.append(res)
-                print(res)
+                stud["ime"]=res
+                #print(res)
 
 
         #segmentacija za jmbag
@@ -161,6 +163,7 @@ for j,y in enumerate(myPicList):
                 _,sharpen= cv2.threshold(sharpen, 127, 255, cv2.THRESH_BINARY)
 
                 cv2.imwrite(ime, sharpen)
+                #cv2.imwrite(ime, test_digits[d])
 
 
                 image = cv2.imread(ime)[:, :, 0]
@@ -170,14 +173,17 @@ for j,y in enumerate(myPicList):
 
                 if testiraj:
                     predictions = modelNumbers.predict(image)
-                    result.append(np.argmax(predictions))
+                    br = np.argmax(predictions)
+                    if br == 10:
+                        br = ""
+                    result.append(br)
 
             if testiraj:
                 res = ""
                 for r in result:
                     res += str(r)
-                stud.append(res)
-                print(res)
+                stud["jmbag"]=res
+                #print(res)
 
         #zadatak
         if x == 2:
@@ -202,6 +208,8 @@ for j,y in enumerate(myPicList):
                 _,sharpen= cv2.threshold(sharpen, 127, 255, cv2.THRESH_BINARY)
 
                 cv2.imwrite(ime, sharpen)
+                #cv2.imwrite(ime, test_digits[d])
+
                 image = cv2.imread(ime)[:, :, 0]
                 image = cv2.resize(image, (28, 28))
                 image = np.invert(np.array([image]))
@@ -209,14 +217,17 @@ for j,y in enumerate(myPicList):
 
                 if testiraj:
                     predictions = modelNumbers.predict(image)
-                    result.append(np.argmax(predictions))
+                    br = np.argmax(predictions)
+                    if br == 10:
+                        br = ""
+                    result.append(br)
 
             if testiraj:
                 res = ""
                 for r in result:
                     res += str(r)
-                stud.append(res)
-                print(res)
+                stud["brzad"]=res
+                #print(res)
 
         #bodovi
         if x==3:
@@ -243,6 +254,8 @@ for j,y in enumerate(myPicList):
                 _,sharpen= cv2.threshold(sharpen, 127, 255, cv2.THRESH_BINARY)
 
                 cv2.imwrite(ime, sharpen)
+                #cv2.imwrite(ime, test_digits[d])
+
                 image = cv2.imread(ime)[:, :, 0]
                 image = cv2.resize(image, (28, 28))
                 image = np.invert(np.array([image]))
@@ -250,29 +263,38 @@ for j,y in enumerate(myPicList):
 
                 if testiraj:
                     predictions = modelNumbers.predict(image)
-                    result.append(np.argmax(predictions))
+                    br=np.argmax(predictions)
+                    if br==10:
+                        br=""
+                    result.append(br)
 
             if testiraj:
                 res = ""
                 for r in result:
                     res += str(r)
-                stud.append(res)
-                print(res)
+                stud["brbod_broj"]=res
+                #print(res)
 
 
 
         if x==4:
             ime = segmentipath + str(y) + "Bodovi.jpg"
             cv2.imwrite(ime, imgCrop)
-            image=cv2.imread(ime)
-            res=test3.readButton(image)
-            stud.append(res)
-            print(res)
+            if testiraj:
+                image=cv2.imread(ime)
+                res=test3.readButton(image)
+                stud["brbod"]=res
+                #print(res)
 
 
         cv2.waitKey(0)
-    print(stud)
-    print("Rezultat:",findStudent.find2(stud[0],stud[1]))
+    if testiraj:
+        print("Rezultat klasifikacije: ",stud)
+        s=findStudent.find2(stud["ime"],stud["jmbag"])
+        print("Najvjerojatniji student i njegovi stvarni podaci: ",s)
+        stud["ime"]=s[0]["ime"]
+        stud["jmbag"] = s[0]["jmbag"]
+        print("Krajnji rezultat programa: ", stud)
 
 
 

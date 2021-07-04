@@ -47,7 +47,7 @@ for i in list:
 
     im2Gray = cv2.cvtColor(imReference, cv2.COLOR_BGR2GRAY)
 
-    # Detect ORB features and compute descriptors.
+
 
     orb = cv2.ORB_create(MAX_FEATURES)
 
@@ -55,17 +55,14 @@ for i in list:
 
     keypoints2, descriptors2 = orb.detectAndCompute(im2Gray, None)
 
-    # Match features.
+
 
     matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
 
     matches = matcher.match(descriptors1, descriptors2, None)
 
-    # Sort matches by score
 
     matches = sorted(matches, key=lambda x:x.distance)
-
-    # Remove not so good matches
 
     numGoodMatches = int(len(matches) * GOOD_MATCH_PERCENT)
 

@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import os
 import openpyxl
+import math
 
 
 
@@ -22,9 +23,9 @@ max_row = sheet.max_row
 for i in range(1, max_row + 1):
     student={}
     for j in range(1, max_col + 1):
-        cell = sheet.cell(row=1, column=j)
+        cellname = sheet.cell(row=1, column=j)
         cell_obj = sheet.cell(row = i, column = j)
-        student[cell.value]= cell_obj.value
+        student[cellname.value]= cell_obj.value
     studenti.append(student)
 
 
@@ -213,13 +214,13 @@ def getStudents():
 def trainNumbers():
 
 
-    number=len(test_oznake_brojevi) ## ==2244
+    number=math.floor(len(test_oznake_brojevi)*0.9) ## ==2244
     number_train=300
-    x_train=np.array(test_images_brojevi)
-    y_train=np.array(test_oznake_brojevi)
+    x_train = np.array(test_images_brojevi[:number])
+    y_train = np.array(test_oznake_brojevi[:number])
 
-    x_test=np.array(test_images_brojevi[1571:2020])
-    y_test=np.array(test_oznake_brojevi[1571:2020])
+    x_test = np.array(test_images_brojevi[number + 1:len(test_oznake_brojevi) - 1])
+    y_test = np.array(test_oznake_brojevi[number + 1:len(test_oznake_brojevi) - 1])
 
 
     def draw(n):
@@ -229,6 +230,7 @@ def trainNumbers():
 
     model = tf.keras.Sequential([
         tf.keras.layers.Flatten(input_shape=(28, 28)),
+        #tf.keras.layers.Dense(512, activation=tf.nn.relu),
         tf.keras.layers.Dense(1024, activation=tf.nn.relu),
         tf.keras.layers.Dense(1024, activation=tf.nn.relu),
         tf.keras.layers.Dense(11, activation=tf.nn.softmax)
@@ -242,8 +244,8 @@ def trainNumbers():
                   )
     model.fit(x_train, y_train, epochs=10)
 
-    #val_loss,val_acc = model.evaluate(x_test,y_test)
-    #print("loss-> ",val_loss,"\nacc-> ",val_acc)
+    val_loss,val_acc = model.evaluate(x_test,y_test)
+    print("loss-> ",val_loss,"\nacc-> ",val_acc)
 
 
     model.save('epic_num_reader4.h5')
@@ -254,13 +256,13 @@ def trainLetters():
 # 11: 271, 12: 57, 13: 101, 14: 87, 15: 105, 16: 135, 17: 165, 18: 49, 19: 184, 20: 39, 21:20,
 # 22: 73, 23: 66, 24: 119, 25: 20, 26: 7, 27: 3579, 28: 4}
 
-    number=len(test_oznake_slova) #==2266
-    print(number,len(test_images_slova))
-    x_train=np.array(test_images_slova)
-    y_train=np.array(test_oznake_slova)
+    number=math.floor(len(test_oznake_slova)*0.9)
 
-    x_test=np.array(test_images_slova[1901:2265])
-    y_test=np.array(test_oznake_slova[1901:2265])
+    x_train=np.array(test_images_slova[:number])
+    y_train=np.array(test_oznake_slova[:number])
+
+    x_test=np.array(test_images_slova[number+1:len(test_oznake_slova)-1])
+    y_test=np.array(test_oznake_slova[number+1:len(test_oznake_slova)-1])
     #(x_train, y_train), (x_test, y_test) = mnist.load_data()
 
     def draw(n):
@@ -282,8 +284,8 @@ def trainLetters():
                   )
     model.fit(x_train, y_train, epochs=10)
 
-    #val_loss,val_acc = model.evaluate(x_test,y_test)
-    #print("loss-> ",val_loss,"\nacc-> ",val_acc)
+    val_loss,val_acc = model.evaluate(x_test,y_test)
+    print("loss-> ",val_loss,"\nacc-> ",val_acc)
 
 
     model.save('epic_letters_reader4.h5')
